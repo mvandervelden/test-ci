@@ -16,8 +16,102 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Description of what the lane does"
-  lane :custom_lane do
-    # add actions here: https://docs.fastlane.tools/actions
+  lane :release do |options|
+    if is_ci
+      if options[:kickoff]
+        kickoff_release(options)
+      else
+        deploy_release(options)
+      end
+    else
+      trigger_release(options)
+    end
+  end
+
+  private_lane :trigger_release do |options|
+    release_branch = options[:release_branch] | "develop"
+    is_test = options[:is_test] #TODO send parameter
+    is_hotfix = options[:is_hotfix] #TODO send parameter
+    ci(circle_job: "kickoff_release", branch: release_branch)
+  end
+
+  private_lane :kickoff_release do |options|
+    #required env var
+    if !ENV["CHANGELOG_GITHUB_TOKEN"]
+      UI.user_error! "env var CHANGELOG_GITHUB_TOKEN is not set, but it's required to deploy a release."
+      return
+    end
+
+    ensure_git_status_clean
+
+    if options[:test]
+      base_branch = options[:is_hotfix] ? "test-develop" : git_branch
+      release_branch = "test-release"
+
+      UI.important "Test release using base-branch: \"#{base_branch}\", release-branch: \"#{release_branch}\"."
+    else
+      base_branch = "develop"
+      release_branch = "release"
+    end
+
+    if options[:is_hotfix]
+      ensure_git_branch(branch: release_branch)
+      git_pull
+    else
+      ensure_git_branch(branch: base_branch)
+      git_pull
+
+      # merge develop (base_branch) into the release branch
+      sh("git checkout " + release_branch)
+      git_pull
+      sh("git merge " + base_branch)
+    end
+
+    # Create a version bump commit on release
+    current_version = File.read('../versionfile.txt')
+    next_version = "#{current_version.to_i + 1}.0"
+
+    open('versionfile.txt', 'w') do |f|
+      f.puts next_version
+    end
+
+    git_commit(path: ".", message: "Version bump")
+    push_to_git_remote
+
+    # Add a tag to the version bump commit
+    git_tag_name = next_version + "-Release"
+    if options[:test]
+      UI.message("If not testing, would add a git tag \"#{git_tag_name}\" now")
+    else
+      prune_git_tags
+      add_git_tag(tag: git_tag_name)
+      push_to_git_remote
+    end
+
+    job_name = "release"
+
+    UI.important("will trigger CI job #{job_name} for branch #{release_branch}")
+    ci(circle_job: job_name, branch: release_branch)
+
+    # Create a Github release
+    add_github_release(new: next_version, prev: current_version, is_dry_run: options[:test])
+
+    # Merge release branch into base branch (develop unless it's a test release)
+    sh("git checkout " + base_branch)
+    git_pull
+
+    begin
+      sh("git merge " + release_branch)
+    rescue => exception
+      UI.important "Git merge failed while merging release-branch: \"#{release_branch}\" into base-branch: \"#{base_branch}\"\nException: #{exception}"
+      UI.important "This conflict needs to be solved manually, I'll create a PR for you to start"
+    else
+      push_to_git_remote
+    end
+  end
+
+  private_lane :deploy_release do |options|
+    UI.important("I'm releasing!!")
+    UI.important("options passed: #{options}")
   end
 end
