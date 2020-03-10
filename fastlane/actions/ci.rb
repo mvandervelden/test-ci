@@ -10,8 +10,8 @@ module Fastlane
         UI.important("CircleCI job: \"#{params[:circle_job]}\" will run on git branch: \"#{params[:branch]}\"")
 
         # CIRCLE_JOB is the name of the job that will be run, specified in `.circleci/config.yml`
-        app_bot_circle_api_token = "2fb74eaaf8a62b654f6c580c4349d93bfa799448"
-        sh("curl -X POST --header 'Content-Type: application/json' -d '{\"build_parameters\": {\"CIRCLE_JOB\":\"#{params[:circle_job]}\"}}' -s https://circleci.com/api/v1.1/project/github/catawiki/iOS-Bidder-App/tree/#{params[:branch]}?circle-token=#{app_bot_circle_api_token} | grep build_url")
+        circle_api_token = ENV["CIRCLE_CI_API_TOKEN"]
+        sh("curl -X POST --header 'Content-Type: application/json' -d '{\"build_parameters\": {\"CIRCLE_JOB\":\"#{params[:circle_job]}\"}}' -s https://circleci.com/api/v1.1/project/github/mvandervelden/test-ci/tree/#{params[:branch]}?circle-token=#{circle_api_token} | grep build_url")
       end
 
       #####################################################
