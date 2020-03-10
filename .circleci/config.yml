@@ -3,12 +3,56 @@
 
 version: 2.1
 
+defaults: &defaults
+  macos:
+    xcode: "11.3.1"
+  environment:
+    LC_ALL: en_US.UTF-8 # required by Fastlane
+    LANG: en_US.UTF-8 # required by Fastlane
+  shell: /bin/bash --login -eo pipefail # required for custom Ruby version
+
+aliases:
+  - &set_ruby_version
+    run:
+      name: Set Ruby Version
+      command: echo "ruby-2.5" > ~/.ruby-version # specifying a custom Ruby version, to make sure we have a proper installation of Bundler
+
+  - &restore_bundle_cache
+    restore_cache:
+      name: Restore Bundle Cache
+      key: v1-gems-{{ checksum "Gemfile.lock" }}
+
+  - &bundle_install
+    run:
+      name: Bundle install
+      command: bundle check || bundle install --path vendor/bundle
+
+  - &save_bundle_cache
+    save_cache:
+      name: Save Bundle Cache
+      key: v1-gems-{{ checksum "Gemfile.lock" }}
+      paths:
+        - vendor/bundle
+
 jobs:
-  build:
-    macos:
-      xcode: 11.0.0 # Specify the Xcode version to use
+  kickoff_release:
+    <<: *defaults
 
     steps:
       - checkout
-      - run: fastlane scan # Run tests using Fastlane
+      - *set_ruby_version
+      - *restore_bundle_cache
+      - *bundle_install
+      - *save_bundle_cache
+      - run: fastlane release kickoff:true
 
+  release:
+    <<: *defaults
+
+    steps:
+      - checkout
+      - *set_ruby_version
+      - *restore_bundle_cache
+      - *bundle_install
+      - *save_bundle_cache
+      - run: fastlane release
