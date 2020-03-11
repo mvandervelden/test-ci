@@ -47,7 +47,7 @@ platform :ios do
       return
     end
 
-    # ensure_git_status_clean
+    ensure_git_status_clean
 
     if options[:test]
       base_branch = options[:is_hotfix] ? "test-develop" : git_branch
@@ -76,7 +76,7 @@ platform :ios do
     current_version = File.read('../versionfile.txt')
     next_version = "#{current_version.to_i + 1}.0"
 
-    open('versionfile.txt', 'w') do |f|
+    open('../versionfile.txt', 'w') do |f|
       f.puts next_version
     end
 
@@ -96,10 +96,10 @@ platform :ios do
     job_name = "release"
 
     UI.important("will trigger CI job #{job_name} for branch #{release_branch}")
-    ci(circle_job: job_name, branch: release_branch)
+    # ci(circle_job: job_name, branch: release_branch)
 
     # Create a Github release
-    add_github_release(new: next_version, prev: current_version, is_dry_run: options[:test])
+    # add_github_release(new: next_version, prev: current_version, is_dry_run: options[:test])
 
     # Merge release branch into base branch (develop unless it's a test release)
     sh("git checkout " + base_branch)
