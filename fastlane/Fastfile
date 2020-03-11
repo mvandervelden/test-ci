@@ -23,6 +23,8 @@ platform :ios do
 
   lane :release do |options|
     if is_ci
+      options[:is_hotfix] = options[:is_hotfix] || ENV["IS_HOTFIX"]
+      options[:is_test] = options[:is_test] || ENV["IS_TEST"]
       if options[:kickoff]
         kickoff_release(options)
       else
@@ -34,10 +36,10 @@ platform :ios do
   end
 
   private_lane :trigger_release do |options|
-    release_branch = "develop" #TODO send parameter based on is test
-    is_test = options[:is_test] #TODO send parameter
-    is_hotfix = options[:is_hotfix] #TODO send parameter
-    ci(circle_job: "kickoff_release", branch: release_branch)
+    release_branch = options[:is_test] ? "test-develop" : "develop"
+    is_test = options[:is_test]
+    is_hotfix = options[:is_hotfix]
+    ci(circle_job: "kickoff_release", branch: release_branch, options: options)
   end
 
   private_lane :kickoff_release do |options|
