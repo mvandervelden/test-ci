@@ -61,7 +61,7 @@ platform :ios do
       release_branch = "release"
     end
 
-    ensure_git_branch(branch: release_branch)
+    sh("git checkout " + release_branch)
     git_pull
 
     unless options[:is_hotfix]
