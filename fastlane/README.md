@@ -26,6 +26,11 @@ fastlane ios test
 fastlane ios release
 ```
 
+### ios kickoff_release
+```
+fastlane ios kickoff_release
+```
+
 
 ----
 
