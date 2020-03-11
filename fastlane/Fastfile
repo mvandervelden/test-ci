@@ -141,8 +141,11 @@ platform :ios do
     if is_dry_run
       UI.important("If not testing, would create Github release with following changelog: \n#{changelog}\nname: \"#{release_name}\"")
     else
-      UI.important("creating release with token: #{ENV["CHANGELOG_GITHUB_TOKEN"]}")
       set_github_release(repository_name: "mvandervelden/test-ci", name: release_name, tag_name: next_version_tag_name, description: "Changelog:\n#{changelog}", api_token: ENV["CHANGELOG_GITHUB_TOKEN"])
     end
+  end
+
+  lane :tmp_gh_release do
+    set_github_release(repository_name: "mvandervelden/test-ci", name: "Test", tag_name: "8.0-Release", description: "Changelog:\nTest", api_token: ENV["CHANGELOG_GITHUB_TOKEN"])
   end
 end
