@@ -6,6 +6,8 @@ version: 2.1
 defaults: &defaults
   docker:
     - image: circleci/ruby:2.5
+      environment:
+        BUNDLER_VERSION: 2.0.2
   # environment:
   #   LC_ALL: en_US.UTF-8 # required by Fastlane
   #   LANG: en_US.UTF-8 # required by Fastlane
