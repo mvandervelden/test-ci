@@ -5,7 +5,7 @@ version: 2.1
 
 defaults: &defaults
   docker:
-    - image: circleci/ruby:2.5
+    - image: circleci/ruby:2.6.0
       environment:
         BUNDLER_VERSION: 2.0.2
   # environment:
