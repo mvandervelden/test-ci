@@ -135,7 +135,7 @@ platform :ios do
 
     changelog = changelog_from_git_commits(between: [current_version_tag_name, next_version_tag_name], pretty: "- %s", merge_commit_filtering: "exclude_merges")
 
-    current_version = options[:prev]
+    current_version = options[:new]
     release_name = "#{current_version}-Release"
 
     if is_dry_run
