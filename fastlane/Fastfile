@@ -23,8 +23,8 @@ platform :ios do
 
   lane :release do |options|
     if is_ci
-      options[:is_hotfix] = options[:is_hotfix] || ENV["IS_HOTFIX"]
-      options[:is_test] = options[:is_test] || ENV["IS_TEST"]
+      options[:is_hotfix] = options[:is_hotfix] || ENV["is_hotfix"]
+      options[:is_test] = options[:is_test] || ENV["is_test"]
       if options[:kickoff]
         kickoff_release(options)
       else
@@ -105,7 +105,7 @@ platform :ios do
     job_name = "release"
 
     UI.important("will trigger CI job #{job_name} for branch #{release_branch}")
-    ci(circle_job: job_name, branch: release_branch)
+    ci(circle_job: job_name, branch: release_branch, options: options)
 
     # Create a Github release
     # TODO fix with env var
