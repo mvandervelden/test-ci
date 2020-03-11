@@ -14,7 +14,6 @@ defaults: &defaults
   # shell: /bin/bash --login -eo pipefail # required for custom Ruby version
 
 aliases:
-
   # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
   - &restore_bundle_cache
     restore_cache:
@@ -25,7 +24,9 @@ aliases:
   - &bundle_install
     run:
       name: Bundle install
-      command: bundle check --path vendor/bundle || bundle install --deployment
+      command: |
+          gem install bundler:2.1.1
+          bundle check || bundle install --jobs=6 --retry=3 --path vendor/bundle
 
   - &save_bundle_cache
     save_cache:
@@ -39,10 +40,6 @@ jobs:
 
     steps:
       - checkout
-      - run:
-          name: Which bundler?
-          command: bundle -v
-
       - *restore_bundle_cache
       - *bundle_install
       - *save_bundle_cache
@@ -53,9 +50,6 @@ jobs:
 
     steps:
       - checkout
-      - run:
-          name: Which bundler?
-          command: bundle -v
       - *restore_bundle_cache
       - *bundle_install
       - *save_bundle_cache
@@ -66,9 +60,6 @@ jobs:
 
     steps:
       - checkout
-      - run:
-          name: Which bundler?
-          command: bundle -v
       - *restore_bundle_cache
       - *bundle_install
       - *save_bundle_cache
