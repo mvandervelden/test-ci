@@ -76,7 +76,14 @@ platform :ios do
 
     # Create a version bump commit on release
     current_version = File.read('../versionfile.txt')
-    next_version = "#{current_version.to_i + 1}.0"
+    major = current_version.split(".")[0].to_i
+
+    if options[:is_hotfix]
+      minor = current_version.split(".")[1].to_i
+      next_version = "#{major}.#{minor + 1}"
+    else
+      next_version = "#{major + 1}.0"
+    end
 
     open('../versionfile.txt', 'w') do |f|
       f.puts next_version
