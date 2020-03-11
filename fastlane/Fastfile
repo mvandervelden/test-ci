@@ -96,10 +96,10 @@ platform :ios do
     job_name = "release"
 
     UI.important("will trigger CI job #{job_name} for branch #{release_branch}")
-    # ci(circle_job: job_name, branch: release_branch)
+    ci(circle_job: job_name, branch: release_branch)
 
     # Create a Github release
-    # add_github_release(new: next_version, prev: current_version, is_dry_run: options[:test])
+    add_github_release(new: next_version, prev: current_version, is_dry_run: options[:test])
 
     # Merge release branch into base branch (develop unless it's a test release)
     sh("git checkout " + base_branch)
