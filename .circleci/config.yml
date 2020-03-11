@@ -25,7 +25,7 @@ aliases:
     run:
       name: Bundle install
       command: |
-          gem install bundler:2.1.1
+          gem install bundler:2.0.2
           bundle check || bundle install --jobs=6 --retry=3 --path vendor/bundle
 
   - &save_bundle_cache
@@ -43,7 +43,7 @@ jobs:
       - *restore_bundle_cache
       - *bundle_install
       - *save_bundle_cache
-      - run: fastlane release kickoff:true
+      - run: bundle exec fastlane release kickoff:true
 
   release:
     <<: *defaults
@@ -53,7 +53,7 @@ jobs:
       - *restore_bundle_cache
       - *bundle_install
       - *save_bundle_cache
-      - run: fastlane release
+      - run: bundle exec fastlane release
 
   test:
     <<: *defaults
@@ -63,7 +63,7 @@ jobs:
       - *restore_bundle_cache
       - *bundle_install
       - *save_bundle_cache
-      - run: fastlane test
+      - run: bundle exec fastlane test
 
 workflows:
   version: 2
