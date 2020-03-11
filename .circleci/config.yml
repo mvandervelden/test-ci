@@ -47,7 +47,7 @@ jobs:
           name: Configure Git
           command: |
             git config user.email "maarten.vdvelden@gmail.com"
-            git config user.name "Release Bot"
+            git config user.name "Release Bot (mmvdv)"
       - run: bundle exec fastlane release kickoff:true
 
   release:
