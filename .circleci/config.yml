@@ -43,9 +43,11 @@ jobs:
       - *restore_bundle_cache
       - *bundle_install
       - *save_bundle_cache
-      - run: |
-        git config user.email "maarten.vdvelden@gmail.com"
-        git config user.name "Maarten van der Velden"
+      - run:
+          name: Configure Git
+          command: |
+            git config user.email "maarten.vdvelden@gmail.com"
+            git config user.name "Maarten van der Velden"
       - run: bundle exec fastlane release kickoff:true
 
   release:
