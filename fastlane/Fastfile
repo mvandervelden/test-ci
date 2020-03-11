@@ -62,7 +62,7 @@ platform :ios do
     end
 
     sh("git checkout " + release_branch)
-    git_pull
+    # git_pull
 
     unless options[:is_hotfix]
       # merge develop (base_branch) into the release branch
