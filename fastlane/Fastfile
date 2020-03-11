@@ -40,7 +40,7 @@ platform :ios do
     ci(circle_job: "kickoff_release", branch: release_branch)
   end
 
-  lane :kickoff_release do |options|
+  private_lane :kickoff_release do |options|
     #required env var
     if !ENV["CHANGELOG_GITHUB_TOKEN"]
       UI.user_error! "env var CHANGELOG_GITHUB_TOKEN is not set, but it's required to deploy a release."
