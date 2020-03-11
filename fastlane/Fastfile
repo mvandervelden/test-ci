@@ -125,4 +125,23 @@ platform :ios do
     sh("git tag -d $(git tag)")
     sh("git fetch --tags")
   end
+
+  desc "Adds github release. NOTE: It is required to generate a GH personal token and store it in env(put it in ~/.bash_profile) under CHANGELOG_GITHUB_TOKEN key"
+  private_lane :add_github_release do |options|
+    is_dry_run = options[:is_dry_run]
+    # If it's a dry run, we don't have a tag to compare against, so we'll use HEAD instead.
+    next_version_tag_name = is_dry_run ? "HEAD" : options[:new] + "-Release"
+    current_version_tag_name = options[:prev] + "-Release"
+
+    changelog = changelog_from_git_commits(between: [current_version_tag_name, next_version_tag_name], pretty: "- %s", merge_commit_filtering: "exclude_merges")
+
+    current_version = options[:prev]
+    release_name = "#{current_version}-Release"
+
+    if is_dry_run
+      UI.important("If not testing, would create Github release with following changelog: \n#{changelog}\nname: \"#{release_name}\"")
+    else
+      set_github_release(repository_name: "mvandervelden/test-ci", name: release_name, tag_name: next_version_tag_name, description: changelog, api_token: ENV["CHANGELOG_GITHUB_TOKEN"])
+    end
+  end
 end
