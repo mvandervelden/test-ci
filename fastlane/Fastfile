@@ -19,7 +19,6 @@ platform :ios do
   lane :test do |options|
     UI.important("I'm Testing!!")
     UI.important("options passed: #{options}")
-    end
   end
 
   lane :release do |options|
