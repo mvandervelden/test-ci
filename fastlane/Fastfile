@@ -119,4 +119,10 @@ platform :ios do
     UI.important("I'm releasing!!")
     UI.important("options passed: #{options}")
   end
+
+  desc "Prunes all local tags that are not in sync with tags on origin"
+  private_lane :prune_git_tags do
+    sh("git tag -d $(git tag)")
+    sh("git fetch --tags")
+  end
 end
