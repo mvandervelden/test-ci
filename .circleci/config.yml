@@ -12,27 +12,24 @@ defaults: &defaults
   # shell: /bin/bash --login -eo pipefail # required for custom Ruby version
 
 aliases:
-  # - &set_ruby_version
-  #   run:
-  #     name: Set Ruby Version
-  #     command: echo "ruby-2.5" > ~/.ruby-version # specifying a custom Ruby version, to make sure we have a proper installation of Bundler
 
-  # - &restore_bundle_cache
-  #   restore_cache:
-  #     name: Restore Bundle Cache
-  #     key: v1-gems-{{ checksum "Gemfile.lock" }}
+  # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+  - &restore_bundle_cache
+    restore_cache:
+      keys:
+        - rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
+        - rails-demo-bundle-v2-
 
   - &bundle_install
     run:
       name: Bundle install
-      command: bundle check || bundle install --path vendor/bundle
+      command: bundle check --path vendor/bundle || bundle install --deployment
 
-  # - &save_bundle_cache
-  #   save_cache:
-  #     name: Save Bundle Cache
-  #     key: v1-gems-{{ checksum "Gemfile.lock" }}
-  #     paths:
-  #       - vendor/bundle
+  - &save_bundle_cache
+    save_cache:
+      key: rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
+      paths:
+        - vendor/bundle
 
 jobs:
   kickoff_release:
@@ -40,10 +37,13 @@ jobs:
 
     steps:
       - checkout
-      # - *set_ruby_version
-      # - *restore_bundle_cache
+      - run:
+          name: Which bundler?
+          command: bundle -v
+
+      - *restore_bundle_cache
       - *bundle_install
-      # - *save_bundle_cache
+      - *save_bundle_cache
       - run: fastlane release kickoff:true
 
   release:
@@ -51,8 +51,29 @@ jobs:
 
     steps:
       - checkout
-      # - *set_ruby_version
-      # - *restore_bundle_cache
+      - run:
+          name: Which bundler?
+          command: bundle -v
+      - *restore_bundle_cache
       - *bundle_install
-      # - *save_bundle_cache
+      - *save_bundle_cache
       - run: fastlane release
+
+  test:
+    <<: *defaults
+
+    steps:
+      - checkout
+      - run:
+          name: Which bundler?
+          command: bundle -v
+      - *restore_bundle_cache
+      - *bundle_install
+      - *save_bundle_cache
+      - run: fastlane test
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
