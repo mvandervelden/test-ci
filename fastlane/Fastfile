@@ -36,7 +36,7 @@ platform :ios do
   end
 
   private_lane :trigger_release do |options|
-    release_branch = options[:is_test] ? "test-develop" : "develop"
+    release_branch = options[:is_test] ? "test-release" : "release"
     is_test = options[:is_test]
     is_hotfix = options[:is_hotfix]
     ci(circle_job: "kickoff_release", branch: release_branch, options: options)
@@ -52,7 +52,7 @@ platform :ios do
     ensure_git_status_clean
 
     if options[:test]
-      base_branch = options[:is_hotfix] ? "test-develop" : git_branch
+      base_branch = "test-develop"
       release_branch = "test-release"
 
       UI.important "Test release using base-branch: \"#{base_branch}\", release-branch: \"#{release_branch}\"."
@@ -61,16 +61,11 @@ platform :ios do
       release_branch = "release"
     end
 
-    if options[:is_hotfix]
-      ensure_git_branch(branch: release_branch)
-      git_pull
-    else
-      ensure_git_branch(branch: base_branch)
-      git_pull
+    ensure_git_branch(branch: release_branch)
+    git_pull
 
+    unless options[:is_hotfix]
       # merge develop (base_branch) into the release branch
-      sh("git checkout " + release_branch)
-      git_pull
       sh("git merge " + base_branch)
     end
 
