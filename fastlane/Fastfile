@@ -65,11 +65,10 @@ platform :ios do
     end
 
     sh("git checkout " + release_branch)
-    # git_pull
 
     unless options[:is_hotfix]
       # merge develop (base_branch) into the release branch
-      sh("git merge " + base_branch)
+      sh("git merge origin/" + base_branch)
     end
 
     # Create a version bump commit on release
