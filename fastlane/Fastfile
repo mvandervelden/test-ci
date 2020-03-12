@@ -30,6 +30,9 @@ platform :ios do
       else
         deploy_release(options)
       end
+    elsif options[:local_test]
+      options[:is_test] = true
+      kickoff_release(options)
     else
       trigger_release(options)
     end
@@ -51,7 +54,7 @@ platform :ios do
 
     ensure_git_status_clean
 
-    if options[:test]
+    if options[:is_test]
       base_branch = "test-develop"
       release_branch = "test-release"
 
@@ -89,7 +92,7 @@ platform :ios do
 
     # Add a tag to the version bump commit
     git_tag_name = next_version + "-Release"
-    if options[:test]
+    if options[:is_test]
       UI.message("If not testing, would add a git tag \"#{git_tag_name}\" now")
     else
       prune_git_tags
@@ -104,7 +107,7 @@ platform :ios do
 
     # Create a Github release
     # TODO fix with env var
-    # add_github_release(new: next_version, prev: current_version, is_dry_run: options[:test])
+    # add_github_release(new: next_version, prev: current_version, is_dry_run: options[:is_test])
 
     # Merge release branch into base branch (develop unless it's a test release)
     sh("git checkout " + base_branch)
