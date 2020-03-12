@@ -1,3 +1,4 @@
+# This file contains the fastlane.tools configuration
 # You can find the documentation at https://docs.fastlane.tools
 #
 # For a list of all available actions, check out
@@ -106,6 +107,7 @@ platform :ios do
 
     # Merge release branch into base branch (develop unless it's a test release)
     sh("git checkout " + base_branch)
+    git_pull
 
     begin
       sh("git merge " + release_branch)
