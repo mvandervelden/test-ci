@@ -103,11 +103,10 @@ platform :ios do
 
     # Create a Github release
     # TODO fix with env var
-    # add_github_release(new: next_version, prev: current_version, is_dry_run: options[:is_test])
+    add_github_release(new: next_version, prev: current_version, is_dry_run: options[:is_test])
 
     # Merge release branch into base branch (develop unless it's a test release)
     sh("git checkout " + base_branch)
-    git_pull
 
     begin
       sh("git merge " + release_branch)
