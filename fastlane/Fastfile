@@ -102,7 +102,6 @@ platform :ios do
     ci(circle_job: job_name, branch: release_branch, options: options)
 
     # Create a Github release
-    # TODO fix with env var
     add_github_release(new: next_version, prev: current_version, is_dry_run: options[:is_test])
 
     # Merge release branch into base branch (develop unless it's a test release)
